@@ -1,0 +1,103 @@
+<SelectModelScreenView>
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDBoxLayout:
+            orientation: "horizontal"
+            size_hint_y: None
+            height: self.minimum_height
+            md_bg_color: app.theme_cls.primary_color
+
+            MDIconButton:
+                icon: "arrow-left"
+                text: "Buscar"
+                icon_color: app.theme_cls.primary_color
+                pos_hint: {"center_y": .5}
+                theme_text_color: "Hint"
+                on_press: root.previous_screen()
+                
+            MDLabel:
+                text: "[b]Step 01:[/b] Define model, input and output filenames."
+                font_size: 20
+                text_size: (self.width, None)
+                halign: "left"
+                markup: True
+                color: (1, 1, 1, 1)
+                size_hint_x: 0.7
+                size_hint_y: None
+                height: 100
+                pos_hint: {"center_x": 0.5}
+
+
+        MDBoxLayout:
+            orientation:"vertical" 
+            size_hint_x: None
+            width: 800
+            pos_hint: {"center_x": 0.5}
+
+
+            MDBoxLayout:
+                orientation: "vertical"
+                cols: 1
+                pos_hint: {"center_x": 0.5}
+                spacing: 10
+
+                TextFieldIconButton:
+                    id: model_path
+                    hint_text: "Select the simulation model"
+                    label_text: "Model:"
+                    text: root.model_file_path
+                    callback: root.get_model_file_path
+                    icon: "folder-search"
+
+                TextFieldIconButton:
+                    hint_text: "Select the simulation's input file"
+                    label_text: "Input:"
+                    text: root.input_file_path
+                    callback: root.get_input_file_path
+                    icon: "folder-search"
+
+                TextFieldIconButton:
+                    hint_text: "Select the simulation's output file"
+                    label_text: "Output:"
+                    text: root.output_file_path
+                    callback: root.get_output_file_path
+                    icon: "folder-search"
+                
+                MDBoxLayout:
+                    spacing: 15
+                    size_hint_y: None
+                    height: self.minimum_height
+                    padding: [0, 15, 0, 15]
+
+                    MDLabel:
+
+                    Button:
+                        text: "Previous"
+                        pos_hint: {"right": 1}
+                        on_release: root.previous_screen()
+                        size_hint_x: None
+                        size_hint_y: None
+                        width: 120
+                        height: 40
+                        background_color: app.theme_cls.primary_color
+                        background_normal: ''
+
+                    Button:
+                        id: next_button
+                        text: "Next"
+                        pos_hint: {"right": 1}
+                        on_release: root.next_screen()
+                        size_hint_x: None
+                        size_hint_y: None
+                        width: 120
+                        height: 40
+                        background_color: app.theme_cls.primary_color
+                        background_normal: ''
+                        disabled: True
+                    
+                MDLabel:
+
+            
+
+            

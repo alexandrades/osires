@@ -1,0 +1,4 @@
+__pycache__/
+Config/*.config
+data/Models/*.joblib
+data/*.*

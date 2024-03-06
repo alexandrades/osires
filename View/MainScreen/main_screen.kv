@@ -1,0 +1,130 @@
+<MainScreenView>
+    MDBoxLayout:
+        orientation:"vertical"
+        pos_hint: {"center_x": 0.5}
+        adaptative_height: True
+        spacing: 15
+        size_hint_x: None
+        width: 800
+
+        MDLabel:
+            text: "Wellcome to OSIRES!"
+            color: (0, 0, 0, 1)
+            size_hint_y: None
+            font_size: 36
+            text_size: (self.width, None)
+            halign: "left"
+            padding: [0, 40, 0, 0]
+
+            
+
+            # md_bg_color: app.theme_cls.primary_color
+
+            # MDLabel:
+            #     text: "Choose the OSIRES file to resume an existing simulation configuration."
+            #     font_size: 12
+            #     color: (0, 0, 0, 1)
+            #     text_size: (self.width, None)
+            #     halign: "center"
+            #     size_hint_y: None
+            #     height: 42
+            #     pos_hint: {"center_x": 0.5}
+            #     padding_y: 15
+
+        TextFieldIconButton:
+            label_text: "Choose the OSIRES file to resume an existing simulation configuration."
+            hint_text: "Select a .osires file to load"
+            callback: root.get_osires_file_path
+            text: root.osires_file
+            icon: "folder-search"
+
+        Button:
+            text: "Create new"
+            pos_hint: {"right": 1}
+            on_release: root.creste_new_optimization()
+            size_hint_x: None
+            size_hint_y: None
+            width: 120
+            height: 40
+            background_color: app.theme_cls.primary_color
+            background_normal: ''
+
+        Label:
+            text:""
+
+<Tab>
+
+    orientation:"vertical"
+    pos_hint: {"center_x": 0.5}
+    adaptative_height: True
+    spacing: 15
+    size_hint_x: None
+    width: 700
+
+    MDLabel:
+        text: "Wellcome to OSIRES!"
+        color: (0, 0, 0, 1)
+        size_hint_y: None
+        font_size: 36
+        text_size: (self.width, None)
+        halign: "left"
+        padding: [0, 40, 0, 0]
+
+        
+
+        # md_bg_color: app.theme_cls.primary_color
+
+        # MDLabel:
+        #     text: "Choose the OSIRES file to resume an existing simulation configuration."
+        #     font_size: 12
+        #     color: (0, 0, 0, 1)
+        #     text_size: (self.width, None)
+        #     halign: "center"
+        #     size_hint_y: None
+        #     height: 42
+        #     pos_hint: {"center_x": 0.5}
+        #     padding_y: 15
+
+    TextFieldIconButton:
+        label_text: "Choose the OSIRES file to resume an existing simulation configuration."
+        hint_text: "Select a .osires file to load"
+
+    MDRaisedButton:
+        text: "Create new"
+        pos_hint: {"right": 1}
+
+    Label:
+        text:""
+
+
+<TextFieldIconButton>
+    # size_hint_x: 0.7
+    orientation: "vertical"
+    pos_hint: {'center_x': 0.5}
+    size_hint_y: None
+
+    MDLabel:
+        text: root.label_text
+        font_size: 12
+        color: (0, 0, 0, 1)
+        text_size: (self.width, None)
+        pos_hint: {"center_x": 0.5, "top": 1}
+
+    MDBoxLayout:
+        orientation: "horizontal"
+        adaptative_height: True
+
+        MDTextField:
+            id: text_field
+            hint_text: root.hint_text
+            text: root.text
+            multiline: False
+            mode: "rectangle"
+
+        MDIconButton:
+            icon: root.icon
+            text: "Buscar"
+            icon_color: app.theme_cls.primary_color
+            pos_hint: {"center_y": .5}
+            theme_text_color: "Hint"
+            on_press: root.callback()

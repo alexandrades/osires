@@ -1,0 +1,165 @@
+<DefineConstraintsScreenView>
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDBoxLayout:
+            orientation: "horizontal"
+            size_hint_y: None
+            height: self.minimum_height
+            md_bg_color: app.theme_cls.primary_color
+
+            MDIconButton:
+                icon: "arrow-left"
+                text: "Buscar"
+                icon_color: app.theme_cls.primary_color
+                pos_hint: {"center_y": .5}
+                theme_text_color: "Hint"
+                # on_press: root.previous_screen()
+
+            MDLabel:
+                text: "[b]Step 03:[/b] Define Constraints"
+                font_size: 20
+                text_size: (self.width, None)
+                halign: "left"
+                markup: True
+                color: (1, 1, 1, 1)
+                size_hint_x: 0.7
+                size_hint_y: None
+                height: 100
+                pos_hint: {"center_x": 0.5}
+
+        MDBoxLayout:
+            orientation:"vertical"
+            size_hint_x: None
+            width: 800
+            pos_hint: {"center_x": 0.5}
+            spacing: 10
+
+            # ScrollView:
+            MDBoxLayout:
+                orientation: "vertical"
+                id: resource_list
+                size_hint_x: 1
+                size_hint_y: None
+                height: self.minimum_height
+
+            MDBoxLayout:
+                orientation: "horizontal"
+                size_hint_y: None
+                pos_hint: {"top": 1}
+                height: self.minimum_height
+                spacing: 10
+
+                TextFieldIconButton:
+                    id: text_field
+                    label_text: "New:"
+                    hint_text: "Insert a new constraint"
+                    callback: root.add_constraint
+                    icon: "plus-thick"
+
+            ScrollView:
+                BoxLayout:
+                    id: constraint_list
+                    orientation:"vertical"
+                    size_hint_y: None
+                    height: self.minimum_height
+                    # spacing: 5
+                    pos_hint: {"top": 1}
+
+
+                    BoxLayout:
+                        id: constraint_list
+                        orientation:"vertical"
+                        size_hint_y: None
+                        height: self.minimum_height
+                        spacing: 5
+                        pos_hint: {"y": 1}
+
+            MDBoxLayout:
+                spacing: 15
+                size_hint_y: None
+                height: self.minimum_height
+                padding: [0, 15, 0, 15]
+
+                MDLabel:
+
+                Button:
+                    text: "Previous"
+                    pos_hint: {"right": 1}
+                    on_release: root.previous_screen()
+                    size_hint_x: None
+                    size_hint_y: None
+                    width: 120
+                    height: 40
+                    background_color: app.theme_cls.primary_color
+                    background_normal: ''
+
+                Button:
+                    id: next_button
+                    text: "Next"
+                    pos_hint: {"right": 1}
+                    on_release: root.next_screen()
+                    size_hint_x: None
+                    size_hint_y: None
+                    width: 120
+                    height: 40
+                    background_color: app.theme_cls.primary_color
+                    background_normal: ''
+                    # disabled: True
+
+
+<ResourceListItem>:
+    text: ""
+    font_size: 14
+    text_size: (self.width, None)
+    halign: "left"
+    markup: True
+    color: (0, 0, 0, 1)
+    size_hint_x: 1
+    size_hint_y: None
+    height: 18
+    shorten: True
+    pos_hint: {"center_x": 0.5, "top": 1}
+
+
+<ConstraintItem>:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: self.minimum_height
+    # padding: [0, 5, 5, 5]
+    pos_hint: {"center_x": 0.5}
+    # size_hint_x: 0.7
+
+    Label:
+        text: "[b]#" + str(root.index) + "[/b] "
+        markup: True
+        color: (0,0,0,1)
+        font_size: 15
+        size_hint_x: 0.1
+
+    Label:
+        text: root.constraint_content
+        height: 40
+        text_size: (self.width, None)
+        halign: "left"
+        color: (0,0,0,1)
+        size_hint_y: None
+        size_hint_x: 0.7
+
+    MDIconButton:
+        icon: "minus-thick"
+        text: ""
+        icon_color: app.theme_cls.primary_color
+        pos_hint: {"center_y": .5}
+        theme_text_color: "Hint"
+        on_press: root.remove()
+        size_hint_x: None
+        size_hint_y: None
+        width: 40
+        height: 40
+
+    # Button:
+    #     text: "-"
+    #     background_color: app.theme_cls.primary_color
+    #     background_normal: ''
+    #     on_release: root.remove()

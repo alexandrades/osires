@@ -1,0 +1,180 @@
+<DefineParamsScreenView>
+    MDBoxLayout:
+        orientation: "vertical"
+
+        MDBoxLayout:
+            orientation: "horizontal"
+            size_hint_y: None
+            height: 100
+            md_bg_color: app.theme_cls.primary_color
+
+            MDIconButton:
+                icon: "arrow-left"
+                text: "Buscar"
+                icon_color: app.theme_cls.primary_color
+                pos_hint: {"center_y": .5}
+                theme_text_color: "Hint"
+                on_press: root.previous_screen()
+                
+            MDLabel:
+                text: "[b]Step 02:[/b] Define resources bounds, steps and initial values"
+                font_size: 20
+                text_size: (self.width, None)
+                halign: "left"
+                markup: True
+                color: (1, 1, 1, 1)
+                size_hint_x: 0.7
+                pos_hint: {"center_x": 0.5}
+
+
+        MDBoxLayout:
+            orientation:"vertical"
+            padding: [0, 30, 0 ,0]
+            size_hint_x: None
+            width: 800
+            pos_hint: {"center_x": 0.5}
+
+
+            ScrollView:
+                MDBoxLayout:
+                    id: resource_list
+                    orientation: "vertical"
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: 10
+                    pos_hint: {"top": 1}
+
+                        
+                    MDLabel:
+
+            MDBoxLayout:
+                spacing: 15
+                size_hint_y: None
+                height: self.minimum_height
+                padding: [0, 15, 0, 15]
+
+                MDLabel:
+
+                Button:
+                    text: "Previous"
+                    pos_hint: {"right": 1}
+                    on_release: root.previous_screen()
+                    size_hint_x: None
+                    size_hint_y: None
+                    width: 120
+                    height: 40
+                    background_color: app.theme_cls.primary_color
+                    background_normal: ''
+
+                Button:
+                    id: next_button
+                    text: "Next"
+                    pos_hint: {"right": 1}
+                    on_release: root.next_screen()
+                    size_hint_x: None
+                    size_hint_y: None
+                    width: 120
+                    height: 40
+                    background_color: app.theme_cls.primary_color
+                    background_normal: ''
+                    # disabled: True
+<ResourceItem>
+    orientation: "vertical"
+    # size_hint_x: 0.7
+    # pos_hint: {"center_x": 0.5}
+    spacing: 30
+    padding: [10,10,10,10]
+    size_hint_y: None
+    height: self.minimum_height
+
+    canvas.before:
+        Color:
+            rgba: (0, 0, 0, 0.1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        id: resource_name
+        text: root.resource_name
+        font_size: 18
+        color: (0, 0, 0, 1)
+        text_size: self.width, None
+        halign: "left"
+        size_hint: (1, None)
+        height: 40
+
+    GridLayout:
+        cols:2
+        spacing: 10
+        size_hint_y: None
+        height: self.minimum_height
+
+        Label:
+            text: "Minimum value"
+            color: (0, 0, 0, 1)
+            font_size: 15
+            text_size: (self.width, None)
+            halign: "right"
+            size_hint_x: 0.3
+            size_hint_y: None
+            height: 40
+
+        TextInput:
+            id: resource_minimum_value
+            text: root.minimum_value
+            multiline: False
+            size_hint_y: None
+            height: 40
+
+
+        Label:
+            text: "Maximum value"
+            color: (0, 0, 0, 1)
+            font_size: 15
+            text_size: (self.width, None)
+            halign: "right"
+            size_hint_y: None
+            size_hint_x: 0.3
+            height: 40
+
+        TextInput:
+            id: resource_maximum_value
+            text: root.maximum_value
+            multiline: False
+            size_hint_y: None
+            height: 40
+
+        Label:
+            text: "Step value"
+            color: (0, 0, 0, 1)
+            font_size: 15
+            text_size: (self.width, None)
+            halign: "right"
+            size_hint_y: None
+            size_hint_x: 0.3
+            height: 40
+
+        TextInput:
+            id: resource_step_value
+            text: root.step_value
+            multiline: False
+            size_hint_y: None
+            height: 40
+
+        Label:
+            text: "Initial value"
+            color: (0, 0, 0, 1)
+            font_size: 15
+            text_size: (self.width, None)
+            halign: "right"
+            size_hint_y: None
+            size_hint_x: 0.3
+            height: 40
+
+        TextInput:
+            id: resource_initial_value
+            text: root.initial_value
+            multiline: False
+            size_hint_y: None
+            height: 40

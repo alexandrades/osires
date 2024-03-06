@@ -1,0 +1,131 @@
+<DefineMethodScreenView>
+    MDBoxLayout:
+        orientation:"vertical"
+        spacing: 20
+
+        MDBoxLayout:
+            orientation: "horizontal"
+            size_hint_y: None
+            height: self.minimum_height
+            md_bg_color: app.theme_cls.primary_color
+
+            MDIconButton:
+                icon: "arrow-left"
+                text: "Buscar"
+                icon_color: app.theme_cls.primary_color
+                pos_hint: {"center_y": .5}
+                theme_text_color: "Hint"
+                # on_press: root.previous_screen()
+
+            MDLabel:
+                text: "[b]Step 04:[/b] Define optmization parameters."
+                font_size: 20
+                text_size: (self.width, None)
+                halign: "left"
+                markup: True
+                color: (1, 1, 1, 1)
+                size_hint_x: 0.7
+                size_hint_y: None
+                height: 100
+                pos_hint: {"center_x": 0.5}
+
+        # ScrollView:
+        MDBoxLayout:
+            orientation:"vertical"
+            size_hint_x: None
+            width: 800
+            pos_hint: {"center_x": 0.5}
+            spacing: 10
+            
+
+            MDGridLayout:
+                # orientation: "horizontal"
+                id: options_grid
+                cols: 2
+                # size_hint_x: 0.7
+                pos_hint: {"center_x": 0.5}
+                spacing: [5, 10]
+
+                MDLabel:
+                    text: "Objective function option:"
+                    color: (0,0,0,1)
+                    text_size: (self.width, None)
+                    halign: "left"
+                    size_hint: (1, None)
+                    height: 28
+                    size_hint_x: 0.4
+                
+                Spinner:
+                    id: opt_type_spinner
+                    text: root.opt_type
+                    values: ('MIN', 'MAX')
+                    size_hint: (1, None)
+                    height: 28
+                    sync_height: True
+
+                MDLabel:
+                    text: "Select optimization method:"
+                    color: (0,0,0,1)
+                    text_size: (self.width, None)
+                    halign: "left"
+                    size_hint: (1, None)
+                    height: 28
+                    size_hint_x: 0.4
+                
+                Spinner:
+                    id: opt_method_spinner
+                    text: root.opt_method
+                    values: ('Scatter', 'Scatter AI', 'GRASP', 'GRASP AI')
+                    size_hint: (1, None)
+                    height: 28
+                    sync_height: True
+
+            BoxLayout:
+                orientation:"horizontal"
+                size_hint_y: None
+                size_hint_x: 1
+                height: 60
+                padding: [0, 15, 0, 15]
+                spacing: 15
+
+                Label:
+                    text:''
+
+                Button:
+                    id: next_button
+                    text: "Save"
+                    pos_hint: {"right": 1}
+                    on_release: root.save_opt_options()
+                    size_hint_x: None
+                    size_hint_y: None
+                    width: 120
+                    height: 40
+                    background_color: app.theme_cls.primary_color
+                    background_normal: ''
+                    # disabled: True
+                    
+                Button:
+                    id: next_button
+                    text: "Back"
+                    pos_hint: {"right": 1}
+                    on_release: root.previous_screen()
+                    size_hint_x: None
+                    size_hint_y: None
+                    width: 120
+                    height: 40
+                    background_color: app.theme_cls.primary_color
+                    background_normal: ''
+                    # disabled: True
+                    
+                Button:
+                    id: next_button
+                    text: "Run"
+                    pos_hint: {"right": 1}
+                    on_release: root.run_opt()
+                    size_hint_x: None
+                    size_hint_y: None
+                    width: 120
+                    height: 40
+                    background_color: app.theme_cls.primary_color
+                    background_normal: ''
+                    # disabled: True

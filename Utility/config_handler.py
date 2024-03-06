@@ -7,13 +7,13 @@ class OsiresFileHandler(BaseScreenModel):
     def __init__(self) -> None:
         super().__init__()
         self._osires_file = ""
-        self._model_file = "CorteEDobra3.cfg"
-        self._model_file_path = "C:\\Users\\alexa\\OneDrive\\Área de Trabalho\\CorteEDobra3.cfg"
-        self._input_file = "inputs.csv"
-        self._input_file_path = "C:\\Users\\alexa\\OneDrive\\Área de Trabalho\\inputs.csv"
-        self._output_file = "CorteEDobra3.dat"
-        self._output_file_path = "C:\\Users\\alexa\\OneDrive\\Área de Trabalho\\CorteEDobra3.dat"
-        self._resources = {'OperatorsCut1': {'minimum_value': 1, 'maximum_value': 20, 'step_value': 1, 'initial_value': 1}, 'OperatorsCut2': {'minimum_value': 1, 'maximum_value': 20, 'step_value': 1, 'initial_value': 1}, 'OperatorsFold1': {'minimum_value': 1, 'maximum_value': 20, 'step_value': 1, 'initial_value': 1}, 'OperatorsFold2': {'minimum_value': 1, 'maximum_value': 20, 'step_value': 1, 'initial_value': 1}}
+        self._model_file = ""
+        self._model_file_path = ""
+        self._input_file = ""
+        self._input_file_path = ""
+        self._output_file = ""
+        self._output_file_path = ""
+        self._resources = {}
         self._constraints = []
         self._best_values = {'Params': [], 'Value': '0'}
         self._opt_type = ""

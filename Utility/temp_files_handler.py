@@ -49,9 +49,9 @@ class TempFilesHandler:
 
                 for parameter, values in resources.items():
                     if param_value == "":
-                        param_value = str(randint(values['minimum_value'], values['maximum_value']))
+                        param_value = str(randint(int(values['minimum_value']), int(values['maximum_value'])))
                     else:
-                        param_value = param_value + " " + str(randint(values['minimum_value'], values['maximum_value']))
+                        param_value = param_value + " " + str(randint(int(values['minimum_value']), int(values['maximum_value'])))
                 param_value = param_value + '\n'
                 file.write(param_value)
 

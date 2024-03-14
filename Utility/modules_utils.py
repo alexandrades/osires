@@ -64,8 +64,8 @@ def get_vizinhos(resources, current_values):
         n = int((100 / len(resources)) / 2)
 
         for idx, resource in enumerate(resources.items()):
-            step = resource[1]['step_value']
-            top = resource[1]['maximum_value']
+            step = int(resource[1]['step_value'])
+            top = int(resource[1]['maximum_value'])
             bottom = top
             had_colision = 0
 
@@ -73,12 +73,12 @@ def get_vizinhos(resources, current_values):
                 top += step
                 bottom -= step
 
-                if top > resource[1]['maximum_value']:
-                    top = resource[1]['minimum_value']
+                if top > int(resource[1]['maximum_value']):
+                    top = int(resource[1]['minimum_value'])
                     had_colision = -1
 
-                if bottom < resource[1]['minimum_value']:
-                    bottom = resource[1]['maximum_value']
+                if bottom < int(resource[1]['minimum_value']):
+                    bottom = int(resource[1]['maximum_value'])
                     had_colision = -1
 
                 if top > bottom and had_colision == -1:

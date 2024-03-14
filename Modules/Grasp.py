@@ -19,7 +19,7 @@ class Grasp:
     def generate_random_inputs(self, resources):
         new_values = self.current_values
         for idx, resource in enumerate(resources.items()):
-            new_values[idx] = randint(resource[1]['minimum_value'], resource[1]['maximum_value'])
+            new_values[idx] = randint(int(resource[1]['minimum_value']), int(resource[1]['maximum_value']))
 
         return new_values
 

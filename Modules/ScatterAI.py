@@ -118,14 +118,22 @@ class ScatterAI:
                     predicted = model.predict([test_x])
                     resources = test_x[:]
 
-                    print("PREDICTED: \n\n", test_x, predicted)
+                    new_value = float(predicted[0][-1])
+                    old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
+
+                    print("PREDICTED: \n\n", test_x, new_value)
+
+                    if self.repository.opt_type == "MIN":
+                        new_value = new_value * -1
+
                     resources.extend(predicted[0])
-                    print("PRÉ-AVALIAÇÃO", predicted[0][-1], self.model.best_values['Value'])
-                    if self.model.best_values['Value'] == 0 or float(predicted[0][-1]) > float(self.model.best_values['Value']):
+                    print("PRÉ-AVALIAÇÃO", new_value, old_value)
+                    if new_value > old_value or old_value == 0:
                         if verify_constraints(header, resources, self.repository):
                             best_values = {"Params": [], "Value": ""}
                             best_values['Params'] = test_x[:]
-                            best_values['Value'] = resources[-1]
+                            new_value = round(new_value, 2)
+                            best_values['Value'] = new_value * -1 if self.repository.opt_type == "MIN" else new_value
                             # best_result[-1] = resources[-1]
                             self.model.best_values = best_values
                             with open(f'Config/{self.repository.model_file[0:-4]}.config', 'w') as json_config:

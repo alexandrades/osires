@@ -52,15 +52,23 @@ class Scatter:
                     line = line.split()
 
                     resources = [int(float(resource)) for resource in line[2:]]
-                    print("PRÉ-AVALIAÇÃO", line[-1], self.model.best_values['Value'])
-                    if float(line[-1]) > float(self.model.best_values['Value']):
+                    new_value = float(line[-1])
+                    old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
+
+
+                    if self.repository.opt_type == "MIN":
+                        new_value = new_value * -1
+
+                    print("PRÉ-AVALIAÇÃO", line[-1], new_value, old_value, new_value > old_value)
+                    if new_value > old_value or old_value == 0:
                         print("VALIDA\n")
                         if verify_constraints(header, resources, self.repository):
                             best_values = {"Params": [], "Value": ""}
-                            # for idx, r in enumerate(resources[:len(simulation_config['Resources'])]):
                             best_values['Params'] = [r for r in resources[:len(self.repository.resources)]]
-                                # best_result['Params'][idx] = r
-                            best_values['Value'] = round(float(line[-1]), 2)
+
+                            new_value = round(new_value, 2)
+                            best_values['Value'] = new_value * -1 if self.repository.opt_type == "MIN" else new_value
+                            
                             self.model.best_values = best_values
                             with open(f'Config/{self.repository.model_file[0:-4]}.config', 'w') as json_config:
                                 json.dump(self.repository.get_dict_config(), json_config, indent=4)

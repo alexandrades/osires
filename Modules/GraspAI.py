@@ -97,32 +97,30 @@ class GraspAI:
             previous_values = self.current_values
             self.vizinhos = get_vizinhos(self.repository.resources, self.current_values)
             for vizinho in self.vizinhos:
+                print("VIZINHO", [vizinho])
                 predicted = model.predict([vizinho])
                 resources = vizinho[:]
                 resources.extend(predicted[0])
-                print("RESOURCES", resources)
-                # if self.model.best_values == 0 or resources[-1] > self.best_result['Value']:
-                if self.model.best_values['Value'] == 0 or float(resources[-1]) > float(self.model.best_values['Value']):
-                    print("MELHORA ENCONTRADA.")
-                    self.current_values = vizinho[:]
+                
+                new_value = float(predicted[0][-1])
+                old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
+
+                if self.repository.opt_type == "MIN":
+                    new_value = new_value * -1
+
+                    print("Validação ", new_value, old_value)
+                if new_value > old_value or old_value == 0:
+                    self.current_values = resources[:len(self.repository.resources)]
 
                     # VERIFICA AS RESTRIÇÕES
                     if verify_constraints(header, resources, self.repository):
                         best_values = {"Params": [], "Value": ""}
-                        best_values['Params'] = resources[:-1]
-                        best_values['Value'] = resources[-1]
+                        best_values['Params'] = self.current_values
+                        new_value = round(new_value, 2)
+                        best_values['Value'] = new_value * -1 if self.repository.opt_type == "MIN" else new_value
                         self.model.best_values = best_values
                         with open(f'Config/{self.repository.model_file[0:-4]}.config', 'w') as json_config:
                                 json.dump(self.repository.get_dict_config(), json_config, indent=4)
-                    
-                    if verify_constraints(header, resources, self.repository):    
-                        # VERIFICAR SE AS RESTRIÇÕES SÃO ATENDIDAS
-                        best_values = {"Params": [], "Value": ""}
-                        best_values['Value'] = predicted[0][-1]
-                        best_values['Params'] = vizinho[:]
-                        self.model.best_values = best_values
-                        with open(f'./config/{self.repository.model_file[0:-4]}.config', 'w') as json_config:
-                            json.dump(self.repository.get_dict_config(), json_config, indent=4)
                         
                         if self.repository.osires_file != '':
                             save_simulation(self.repository.osires_file, self.repository.get_dict_config())

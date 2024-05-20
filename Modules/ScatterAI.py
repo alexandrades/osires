@@ -82,7 +82,7 @@ class ScatterAI:
             if not os.path.exists(f"data/Models/{self.repository.model_file[:-4]}_KNeighborsRegressor.joblib"):
                 train_x, train_y = train_split(self.repository.output_file_path, self.repository.resources)
                 model = KNeighborsRegressor()
-                model.fit([train_x], [train_y])
+                model.fit(train_x, train_y)
                 joblib.dump(model, f"data/Models/{self.repository.model_file[:-4]}_KNeighborsRegressor.joblib")
             else:
                 print("Loaded")
@@ -92,7 +92,7 @@ class ScatterAI:
             if not os.path.exists(f"data/Models/{self.repository.model_file[:-4]}_GaussianProcessRegressor.joblib"):
                 train_x, train_y = train_split(self.repository.output_file_path, self.repository.resources)
                 model = GaussianProcessRegressor()
-                model.fit([train_x], [train_y])
+                model.fit(train_x, train_y)
                 joblib.dump(model, f"data/Models/{self.repository.model_file[:-4]}_GaussianProcessRegressor.joblib")
             else:
                 print("Loaded")

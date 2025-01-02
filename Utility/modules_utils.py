@@ -14,9 +14,12 @@ def add_config_parameter(config_file, key, value):
 def verify_constraints(header, resources, repository):
     operators = ['>', '<', '==', '+', '-', '*', '/', '!=', '**', '>=', '<=', '%', 'and', 'or', 'not']
     mapping = {}
-
+    
     for idx, resource in enumerate(resources):
-        mapping[header[idx+1]] = resource
+        mapping[header[idx+1]] = float(resource)
+        print(f"t: {type(mapping[header[idx+1]])}")
+    
+    print(f"teste: {mapping['[Simulation].OperatorsCut1'] + mapping['[Simulation].OperatorsCut2']}\n")
 
     for constraint in repository.constraints:
         constraint = constraint.split()
@@ -28,6 +31,7 @@ def verify_constraints(header, resources, repository):
                 constraint[idx] = f"mapping['{element}']"
 
         constraint = ' '.join(constraint)
+        print(f"here: {constraint}\n")
         if not eval(constraint):
             return False
     
@@ -43,6 +47,7 @@ def save_simulation(save_path, opt_config):
 def train_split(output_file_path, resources):
         train_x = []
         train_y = []
+        val = False
 
         with open(output_file_path, 'r') as data_file:
             lines = data_file.readlines()[1:]
@@ -50,13 +55,19 @@ def train_split(output_file_path, resources):
 
             for line in lines:
                 line = re.sub(r'\t+', ' ', line).split()
+                if(len(line) == 0): continue
+                if(('Scenario' not in line[0]) and (not val)): continue
+                val = True
+                if ((line[-1][-1] == ':') or (line[-1][-1] == '.') or ('Scenario' in line[0])): continue
 
-                input = [float(r) for r in line[2:parameters_qtt+2]]
-                output = [float(p) for p in line[parameters_qtt+2:]]
-
+                try:
+                    input = [float(r) for r in line[2:parameters_qtt+2]]
+                    output = [float(p) for p in line[parameters_qtt+2:]]
+                except:
+                    continue
+                
                 train_x.append(input)
                 train_y.append(output)
-
         return (train_x, train_y)
 
 def get_vizinhos(resources, current_values):
@@ -84,8 +95,8 @@ def get_vizinhos(resources, current_values):
                 if top > bottom and had_colision == -1:
                     break
                 
-                top_neighbor = current_values[:]
-                bottom_neighbor = current_values[:]
+                top_neighbor = [int(val) for val in current_values[:]]
+                bottom_neighbor = [int(val) for val in current_values[:]]
                 top_neighbor[idx] = top
                 bottom_neighbor[idx] = bottom
                 

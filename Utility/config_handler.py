@@ -16,6 +16,7 @@ class OsiresFileHandler(BaseScreenModel):
         self._resources = {}
         self._constraints = []
         self._best_values = {'Params': [], 'Value': '0'}
+        self._best_values_set = {'Values': [], 'Interactions': []}
         self._opt_type = ""
         self._opt_method = ""
         self._ml_algorithm = ""
@@ -106,6 +107,14 @@ class OsiresFileHandler(BaseScreenModel):
         self._best_values = value
 
     @property
+    def best_values_set(self) -> dict:
+        return self._best_values_set
+
+    @best_values_set.setter
+    def best_values_set(self, value: dict) -> None:
+        self._best_values_set = value
+
+    @property
     def opt_method(self):
         return self._opt_method
     
@@ -148,6 +157,7 @@ class OsiresFileHandler(BaseScreenModel):
             "Resources": self.resources,
             "Constraints": self.constraints,
             "Best": self.best_values,
+            "BestSet": self.best_values_set,
             "OptMethod": self.opt_method,
             "OptType": self.opt_type,
             "MlAlgorithm": self.ml_algorithm,

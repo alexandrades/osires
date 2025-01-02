@@ -6,6 +6,7 @@ from Modules.Grasp import Grasp
 from Modules.Scatter import Scatter
 from Modules.ScatterAI import ScatterAI
 from Modules.GraspAI import GraspAI
+from Utility.graph_generator import build_graph
 # from Modules.Scatter import Scatter, ScatterAI
 
 # We have to manually reload the view module in order to apply the
@@ -34,6 +35,8 @@ class OptResultScreenController:
     def set_initial_values(self) -> None:
         print("SET INITIAL VALUES \n\n")
         self.model.best_values = self.view.app.repository.best_values
+        self.model.best_values_set = self.view.app.repository.best_values_set
+        self.model.graph = build_graph(self.view.app.repository)
 
     def init_optimization(self):
         opt_method = self.view.app.repository.opt_method
@@ -59,6 +62,11 @@ class OptResultScreenController:
             
     def update_repository(self):
         self.view.app.repository.best_values = self.model.best_values
+        self.view.app.repository.best_values_set = self.model.best_values_set
+
+    
+    def rebuild_graph(self):
+        self.model.graph = build_graph(self.view.app.repository)
 
     def previous_screen(self):
         self.update_repository()
@@ -66,4 +74,7 @@ class OptResultScreenController:
 
     def update(self):
         self.update_repository()
+        self.rebuild_graph()
         self.view.best_values = self.model.best_values
+        self.view.best_values_set = self.model.best_values_set
+        self.view.graph = self.model.graph

@@ -12,6 +12,9 @@ class Scatter:
     def __init__(self, repository, model) -> None:
         self.repository = repository
         self.model = model
+        self.vizinhos = []
+        self.best_values_set = {'Values': [], 'Interactions': []}
+        self.interaction = 0
 
     def compare_simulation_results(simulation_config, best_result):
         with open(f"data/{simulation_config['Model'][:-4]}.dat", 'r') as result_file:
@@ -35,9 +38,9 @@ class Scatter:
         while not event.is_set():
             TempFilesHandler.generate_random_inputs(self.repository.input_file, self.repository.resources)
             if sys.platform.startswith('linux'):
-                os.system("java -jar JaamSim2022-06.jar " + self.repository.model_file + " -h")
+                os.system("java -jar JaamSim2024-08.jar " + self.repository.model_file + " -h")
             else:
-                os.system("java -jar JaamSim2022-06.jar data/" + self.repository.model_file + " -h")
+                os.system("java -jar JaamSim2024-08.jar data/" + self.repository.model_file + " -h")
 
             if not event.is_set():
                 TempFilesHandler.save_result(self.repository.model_file, self.repository.output_file_path)
@@ -48,13 +51,17 @@ class Scatter:
                 lines = result_file.readlines()
 
                 for line in lines:
-                    line = re.sub(r'\t+', ' ', line)
-                    line = line.split()
+                    self.interaction += 1
+
+                    line = re.sub(r'\t+', ' ', line).split()
+                    if(len(line) == 0): continue
+                    if('Scenario' in line[0]): continue
+                    print("COMPARAÇAO: ", line[-1], self.model.best_values['Value'])
 
                     resources = [int(float(resource)) for resource in line[2:]]
                     new_value = float(line[-1])
                     old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
-
+                    old_params = self.repository.best_values['Params']
 
                     if self.repository.opt_type == "MIN":
                         new_value = new_value * -1
@@ -70,11 +77,25 @@ class Scatter:
                             best_values['Value'] = new_value * -1 if self.repository.opt_type == "MIN" else new_value
                             
                             self.model.best_values = best_values
+                            self.best_values_set['Interactions'].append(self.interaction)
+                            self.best_values_set['Values'].append(best_values['Value'])
+
                             with open(f'Config/{self.repository.model_file[0:-4]}.config', 'w') as json_config:
                                 json.dump(self.repository.get_dict_config(), json_config, indent=4)
                             
                             if self.repository.osires_file != '':
                                 save_simulation(self.repository.osires_file, self.repository.get_dict_config())
+                    
+                    else:
+                        self.best_values_set['Interactions'].append(self.interaction)
+                        self.best_values_set['Values'].append(old_value)
+                        best_values = {"Params": [], "Value": ""}
+                        best_values['Value'] = old_value
+                        best_values['Params'] = old_params
+                        self.model.best_values = best_values
+                    
+                    self.model.best_values_set = self.best_values_set
+
                 print('ok')
 
             TempFilesHandler.clear_input_file(self.repository.input_file)

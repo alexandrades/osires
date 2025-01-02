@@ -1,0 +1,50 @@
+{
+    "Model": "Production_line.cfg",
+    "ModelPath": "C:\\UFSJ\\IC\\IC_2024\\rep\\osires\\Examples\\Production Line\\Production_line0.cfg",
+    "Input": "inputs.csv",
+    "InputPath": "C:\\UFSJ\\IC\\IC_2024\\rep\\osires\\Examples\\Production Line\\inputs0.csv",
+    "Output": "Production_line.dat",
+    "OutputPath": "C:\\UFSJ\\IC\\IC_2024\\rep\\osires\\Examples\\Production Line\\Production_line0.dat",
+    "Resources": {
+        "OperatorsCut1": {
+            "minimum_value": "1",
+            "maximum_value": "50",
+            "step_value": "1",
+            "initial_value": "1"
+        },
+        "OperatorsCut2": {
+            "minimum_value": "1",
+            "maximum_value": "50",
+            "step_value": "1",
+            "initial_value": "1"
+        },
+        "OperatorsFold1": {
+            "minimum_value": "1",
+            "maximum_value": "50",
+            "step_value": "1",
+            "initial_value": "1"
+        },
+        "OperatorsFold2": {
+            "minimum_value": "1",
+            "maximum_value": "50",
+            "step_value": "1",
+            "initial_value": "1"
+        }
+    },
+    "Constraints": [
+        "[Simulation].OperatorsCut1 + [Simulation].OperatorsCut2 + [Simulation].OperatorsFold1 + [Simulation].OperatorsFold2 <= 100"
+    ],
+    "Best": {
+        "Params": [
+            6,
+            19,
+            3,
+            9
+        ],
+        "Value": 44259082.41
+    },
+    "OptMethod": "Scatter",
+    "OptType": "MAX",
+    "MlAlgorithm": "",
+    "MinSimulationsTrain": ""
+}

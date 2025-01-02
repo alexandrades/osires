@@ -16,6 +16,9 @@ class ScatterAI:
     def __init__(self, repository, model) -> None:
         self.repository = repository
         self.model = model
+        self.vizinhos = []
+        self.best_values_set = {'Values': [], 'Interactions': []}
+        self.interaction = 0
 
     def train_split(self, output_file_path, resources):
         train_x = []
@@ -44,9 +47,9 @@ class ScatterAI:
                 break
             TempFilesHandler.generate_random_inputs(self.repository.input_file, self.repository.resources)
             if sys.platform.startswith('linux'):
-                os.system("java -jar JaamSim2022-06.jar " + self.repository.model_file + " -h")
+                os.system("java -jar JaamSim2024-08.jar " + self.repository.model_file + " -h")
             else:
-                os.system("java -jar JaamSim2022-06.jar data/" + self.repository.model_file + " -h")
+                os.system("java -jar JaamSim2024-08.jar data/" + self.repository.model_file + " -h")
 
             TempFilesHandler.save_result(self.repository.model_file, self.repository.output_file_path)
 
@@ -102,24 +105,37 @@ class ScatterAI:
             TempFilesHandler.generate_random_inputs(self.repository.input_file, self.repository.resources)
 
             with open("data/" + self.repository.input_file, 'r') as input_file:
-                
-                lines = input_file.readlines()[1:]
 
                 
                 with open(self.repository.output_file_path, 'r') as output_file:
-                    header = output_file.readline()
-                    header = re.sub(r'\t+', ' ', header).split()
-                for idx, line in enumerate(lines):
+                    
+                    lines = output_file.readlines()
+                    for line in lines:
+                        line = re.sub(r'\t+', ' ', line).split()
+                        if(len(line) == 0): continue
+                        if('Scenario' not in line[0]): continue
+                        header = line
+                        break
+                
+                lines = input_file.readlines()[1:]
+
+                for line in lines:
+                    self.interaction += 1
                     print("Predicting")
 
                     
-                    line = line.split()
+                    line = re.sub(r'\t+', ' ', line).split()
+                    if(len(line) == 0): continue
+                    if('Scenario' in line[0]): continue
+                    print("COMPARAÇAO: ", line[-1], self.model.best_values['Value'])
+
                     test_x = [int(l) for l in line]
                     predicted = model.predict([test_x])
+                    
                     resources = test_x[:]
-
                     new_value = float(predicted[0][-1])
                     old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
+                    old_params = self.repository.best_values['Params']
 
                     print("PREDICTED: \n\n", test_x, new_value)
 
@@ -136,11 +152,24 @@ class ScatterAI:
                             best_values['Value'] = new_value * -1 if self.repository.opt_type == "MIN" else new_value
                             # best_result[-1] = resources[-1]
                             self.model.best_values = best_values
+                            self.best_values_set['Interactions'].append(self.interaction)
+                            self.best_values_set['Values'].append(best_values['Value'])
+
                             with open(f'Config/{self.repository.model_file[0:-4]}.config', 'w') as json_config:
                                 json.dump(self.repository.get_dict_config(), json_config, indent=4)
 
                             if self.repository.osires_file != '':
                                 save_simulation(self.repository.osires_file, self.repository.get_dict_config())
+                    
+                    else:
+                        self.best_values_set['Interactions'].append(self.interaction)
+                        self.best_values_set['Values'].append(old_value)
+                        best_values = {"Params": [], "Value": ""}
+                        best_values['Value'] = old_value
+                        best_values['Params'] = old_params
+                        self.model.best_values = best_values
+                    
+                    self.model.best_values_set = self.best_values_set
 
             TempFilesHandler.clear_input_file(self.repository.input_file)
 

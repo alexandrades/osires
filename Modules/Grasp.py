@@ -2,6 +2,7 @@ import sys
 import os
 import re
 import json
+import copy
 from random import randint
 from Utility.modules_utils import verify_constraints, save_simulation, get_vizinhos
 from Utility.temp_files_handler import TempFilesHandler
@@ -14,6 +15,8 @@ class Grasp:
         self.steps = self.get_steps()
         # self.limites = simulation_config['Resources']
         self.vizinhos = []
+        self.best_values_set = {'Values': [], 'Interactions': []}
+        self.interaction = 0
         # self.save_path = save_path
 
     def generate_random_inputs(self, resources):
@@ -45,9 +48,9 @@ class Grasp:
 
             print("INICIANDO EXECUÇÃO DAS SIMULAÇÕES.")
             if sys.platform.startswith('linux'):
-                os.system("java -jar JaamSim2022-06.jar " + self.repository.model_file + " -h")
+                os.system("java -jar JaamSim2024-08.jar " + self.repository.model_file + " -h")
             else:
-                os.system("java -jar JaamSim2022-06.jar data/" + self.repository.model_file + " -h")
+                os.system("java -jar JaamSim2024-08.jar data/" + self.repository.model_file + " -h")
 
             print("FIM DAS SIMULAÇÕES")
             print("COMPARANDO OS RESULTADOS COM O MELHOR ATUAL")
@@ -57,14 +60,17 @@ class Grasp:
                 lines = output_file.readlines()
 
                 for line in lines:
+                    self.interaction += 1
                     line = re.sub(r'\t+', ' ', line).split()
-                    if line[-1][-1] == ':':
-                        print("TODOS OS RESULTADOS COMPARADOS")
-                        break
+                    if(len(line) == 0): continue
+                    if('Scenario' in line[0]): continue
+
+
                     print("COMPARAÇAO: ", line[-1], self.model.best_values['Value'])
 
                     new_value = float(line[-1])
                     old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
+                    old_params = self.repository.best_values['Params']
 
                     if self.repository.opt_type == "MIN":
                         new_value = new_value * -1
@@ -85,12 +91,27 @@ class Grasp:
                             new_value = round(new_value, 2)
                             best_values['Value'] = new_value * -1 if self.repository.opt_type == "MIN" else new_value
                             self.model.best_values = best_values
+                            self.best_values_set['Interactions'].append(self.interaction)
+                            self.best_values_set['Values'].append(best_values['Value'])
+
                             with open(f'./config/{self.repository.model_file[0:-4]}.config', 'w') as json_config:
                                 json.dump(self.repository.get_dict_config(), json_config, indent=4)
                             # save_simulation(self.save_path, self.simulation_config)
                             
                             if self.repository.osires_file != '':
                                 save_simulation(self.repository.osires_file, self.repository.get_dict_config())
+                    
+                    else:
+                        self.best_values_set['Interactions'].append(self.interaction)
+                        self.best_values_set['Values'].append(old_value)
+                        best_values = {"Params": [], "Value": ""}
+                        best_values['Value'] = old_value
+                        best_values['Params'] = old_params
+                        self.model.best_values = best_values
+
+                    self.model.best_values_set = self.best_values_set
+
+                    
 
             if self.current_values == previous_values:
                 self.current_values = self.generate_random_inputs(self.repository.resources)

@@ -1,6 +1,12 @@
-kivy==2.3.0
+Kivy==2.3.0
+kivy-deps.angle==0.4.0
+kivy-deps.glew==0.3.1
+kivy-deps.sdl2==0.7.0
+Kivy-Garden==0.1.5
+kivy_garden.matplotlib==0.1.1.dev0
 kivymd==1.1.1
-numpy==1.21.1
+setuptools==75.2.0
+numpy
 watchdog
 plyer
 scikit-learn

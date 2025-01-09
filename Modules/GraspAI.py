@@ -112,9 +112,12 @@ class GraspAI:
                 resources = vizinho[:]
                 resources.extend(predicted[0])
                 
-                new_value = float(predicted[0][-1])
-                old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
-                old_params = self.repository.best_values['Params']
+                try:
+                    new_value = float(predicted[0][-1])
+                    old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
+                    old_params = self.repository.best_values['Params']
+                except:
+                    continue
 
                 if self.repository.opt_type == "MIN":
                     new_value = new_value * -1

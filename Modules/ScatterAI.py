@@ -133,9 +133,13 @@ class ScatterAI:
                     predicted = model.predict([test_x])
                     
                     resources = test_x[:]
-                    new_value = float(predicted[0][-1])
-                    old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
-                    old_params = self.repository.best_values['Params']
+
+                    try:
+                        new_value = float(predicted[0][-1])
+                        old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
+                        old_params = self.repository.best_values['Params']
+                    except:
+                        continue
 
                     print("PREDICTED: \n\n", test_x, new_value)
 

@@ -68,9 +68,12 @@ class Grasp:
 
                     print("COMPARAÇAO: ", line[-1], self.model.best_values['Value'])
 
-                    new_value = float(line[-1])
-                    old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
-                    old_params = self.repository.best_values['Params']
+                    try:
+                        new_value = float(line[-1])
+                        old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
+                        old_params = self.repository.best_values['Params']
+                    except:
+                        continue
 
                     if self.repository.opt_type == "MIN":
                         new_value = new_value * -1

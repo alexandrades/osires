@@ -5,7 +5,7 @@ import numpy as np
 
 def build_graph(repository):
     fig, ax0 = plt.subplots(1, 1, figsize=(8, 4))
-    if(repository.best_values_set != {}): 
+    if(repository.best_values_set != {} and repository.best_values_set['Interactions'] != {} and repository.best_values_set['Values'] != {}): 
         ax0.plot(repository.best_values_set['Interactions'], repository.best_values_set['Values'], linewidth = 2) 
         maxx = max(repository.best_values_set['Interactions'])
         maxy = max(repository.best_values_set['Values'])

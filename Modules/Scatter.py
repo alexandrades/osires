@@ -56,7 +56,6 @@ class Scatter:
                     line = re.sub(r'\t+', ' ', line).split()
                     if(len(line) == 0): continue
                     if('Scenario' in line[0]): continue
-                    print("COMPARAÇAO: ", line[-1], self.model.best_values['Value'])
 
                     resources = [int(float(resource)) for resource in line[2:]]
 
@@ -66,6 +65,8 @@ class Scatter:
                         old_params = self.repository.best_values['Params']
                     except:
                         continue
+
+                    print("COMPARAÇAO: ", line[-1], self.model.best_values['Value'])
 
                     if self.repository.opt_type == "MIN":
                         new_value = new_value * -1

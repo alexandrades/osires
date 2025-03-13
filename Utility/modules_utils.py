@@ -17,7 +17,6 @@ def verify_constraints(header, resources, repository):
     
     for idx, resource in enumerate(resources):
         mapping[header[idx+1]] = float(resource)
-        print(f"t: {type(mapping[header[idx+1]])}")
     
     print(f"teste: {mapping['[Simulation].OperatorsCut1'] + mapping['[Simulation].OperatorsCut2']}\n")
 
@@ -31,7 +30,6 @@ def verify_constraints(header, resources, repository):
                 constraint[idx] = f"mapping['{element}']"
 
         constraint = ' '.join(constraint)
-        print(f"here: {constraint}\n")
         if not eval(constraint):
             return False
     

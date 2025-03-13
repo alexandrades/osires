@@ -1,9 +1,11 @@
+import kivy
 from View.base_screen import BaseScreenView
 from kivy.properties import StringProperty, DictProperty, NumericProperty
 from kivy_garden.matplotlib import FigureCanvasKivyAgg
 from kivy.clock import Clock
 import threading
-
+import logging
+logging.basicConfig(level=logging.WARNING)
 
 class OptResultScreenView(BaseScreenView):
     best_values = DictProperty({'Params': [], 'Value': ''})

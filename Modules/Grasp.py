@@ -42,8 +42,7 @@ class Grasp:
                     l = ""
                     for v_i in v:
                         l += str(v_i) + " "
-
-                    l += '\n'
+                    l += "\n"
                     file.write(l)
 
             print("INICIANDO EXECUÇÃO DAS SIMULAÇÕES.")
@@ -55,9 +54,13 @@ class Grasp:
             print("FIM DAS SIMULAÇÕES")
             print("COMPARANDO OS RESULTADOS COM O MELHOR ATUAL")
             with open("data/" + self.repository.model_file[:-3] + "dat", 'r') as output_file:
-                header = output_file.readline()
-                header = re.sub(r'\t+', ' ', header).split()
                 lines = output_file.readlines()
+                for line in lines:
+                    line = re.sub(r'\t+', ' ', line).split()
+                    if(len(line) == 0): continue
+                    if('Scenario' not in line[0]): continue
+                    header = line
+                    break
 
                 for line in lines:
                     self.interaction += 1
@@ -65,15 +68,14 @@ class Grasp:
                     if(len(line) == 0): continue
                     if('Scenario' in line[0]): continue
 
-
-                    print("COMPARAÇAO: ", line[-1], self.model.best_values['Value'])
-
                     try:
                         new_value = float(line[-1])
                         old_value = float(self.repository.best_values['Value']) * -1 if self.repository.opt_type == "MIN" else float(self.repository.best_values['Value'])
                         old_params = self.repository.best_values['Params']
                     except:
                         continue
+
+                    print("COMPARAÇAO: ", line[-1], self.model.best_values['Value'])
 
                     if self.repository.opt_type == "MIN":
                         new_value = new_value * -1
@@ -98,6 +100,8 @@ class Grasp:
                             self.best_values_set['Values'].append(best_values['Value'])
 
                             with open(f'./config/{self.repository.model_file[0:-4]}.config', 'w') as json_config:
+                                config_data = self.repository.get_dict_config()
+                                print("Config:", config_data)
                                 json.dump(self.repository.get_dict_config(), json_config, indent=4)
                             # save_simulation(self.save_path, self.simulation_config)
                             
@@ -119,6 +123,11 @@ class Grasp:
             if self.current_values == previous_values:
                 self.current_values = self.generate_random_inputs(self.repository.resources)
             print("FIM DA COMPARAÇÃO.")
+        
+        #PARA ANÁLISE DE RESULTADOS
+        print("Salvando os resultados em GRASP_"+self.repository.model_file[:-4]+".json")
+        with open("data/results/GRASP_"+self.repository.model_file[:-4]+".json", 'w') as file:
+            json.dump(self.best_values_set, file, indent=4)
                 
 
 

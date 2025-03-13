@@ -20,6 +20,8 @@ from kivymd.uix.screenmanager import MDScreenManager
 from kivy.uix.screenmanager import NoTransition, ScreenManager
 from Utility.config_handler import OsiresFileHandler
 from kivy.clock import Clock
+import logging
+logging.basicConfig(level=logging.WARNING)
 
 
 

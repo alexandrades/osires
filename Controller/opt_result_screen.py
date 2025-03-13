@@ -6,7 +6,12 @@ from Modules.Grasp import Grasp
 from Modules.Scatter import Scatter
 from Modules.ScatterAI import ScatterAI
 from Modules.GraspAI import GraspAI
+from Modules.PSO import PSO
 from Utility.graph_generator import build_graph
+import os
+os.environ['KIVY_NO_CONSOLELOG'] = '1'  # Oculta logs do Kivy
+import kivy
+kivy.logger.Logger.setLevel('WARNING')  # Ou 'ERROR' para exibir apenas erros
 # from Modules.Scatter import Scatter, ScatterAI
 
 # We have to manually reload the view module in order to apply the
@@ -58,6 +63,11 @@ class OptResultScreenController:
         if opt_method == "GRASP AI":
             grasp_ai = GraspAI(self.view.app.repository, self.model)
             simulation_thread = threading.Thread(target=grasp_ai.execute_simulation, args=(self.view.stop_optimization,))
+            simulation_thread.start()
+
+        if opt_method == "PSO":
+            pso = PSO(self.view.app.repository, self.model)
+            simulation_thread = threading.Thread(target=pso.execute_simulation, args=(self.view.stop_optimization,))
             simulation_thread.start()
             
     def update_repository(self):

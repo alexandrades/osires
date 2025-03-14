@@ -61,7 +61,6 @@ class Swarm():
                     save_simulation(repository.osires_file, repository.get_dict_config())
             particle.update(w, c1, c2, self.g_best)
 
-        # Salva a posição das partículas para a animação
         return self.best_value, self.g_best.tolist()
 
 class PSO:

@@ -18,8 +18,6 @@ def verify_constraints(header, resources, repository):
     for idx, resource in enumerate(resources):
         mapping[header[idx+1]] = float(resource)
     
-    print(f"teste: {mapping['[Simulation].OperatorsCut1'] + mapping['[Simulation].OperatorsCut2']}\n")
-
     for constraint in repository.constraints:
         constraint = constraint.split()
         for idx, element in enumerate(constraint):

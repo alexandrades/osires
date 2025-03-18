@@ -75,7 +75,7 @@ class DefineMethodScreenView(BaseScreenView):
         )
 
         label_min_simulations = MDLabel(
-            text="Minimum simulations for train AI:",
+            text="Min. AI Training Dataset Size:",
             color= (0, 0, 0, 1),
             text_size= (self.width, None),
             halign= "left",

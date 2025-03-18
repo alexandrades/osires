@@ -1,12 +1,16 @@
-import sys
+from random import randint
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.gaussian_process import GaussianProcessRegressor
+from Utility.temp_files_handler import TempFilesHandler
+from Utility.modules_utils import verify_constraints, save_simulation, train_split
+import numpy as np
+import joblib
 import os
+import sys
 import re
 import json
-import copy
-import numpy as np
-from random import randint
-from Utility.modules_utils import verify_constraints, save_simulation
-from Utility.temp_files_handler import TempFilesHandler
 
 class Firefly():
     def __init__(self, n_dimensions, mins, maxs, max_prob, scale):
@@ -71,8 +75,8 @@ class FireflySwarm():
         mean_distance = np.mean([np.linalg.norm(f1.position - f2.position) for f1 in self.fireflys for f2 in self.fireflys if f1 != f2])
         self.gamma = 0.693 / (mean_distance**2)
 
-    def evaluate(self, f, repository):
-        values = f([firefly.position for firefly in self.fireflys])
+    def evaluate(self, header, f, repository):
+        values = f([firefly.position for firefly in self.fireflys], header)
         i = 0
         for value, firefly in zip(values, self.fireflys):
             firefly.evaluate(value)
@@ -90,8 +94,8 @@ class FireflySwarm():
                 if repository.osires_file != '':
                     save_simulation(repository.osires_file, repository.get_dict_config())
 
-    def update(self, f, repository):
-        self.evaluate(f, repository)
+    def update(self, header, f, repository):
+        self.evaluate(header, f, repository)
         for i, firefly in enumerate(self.fireflys):
             for j, firefly2 in enumerate(self.fireflys):
                 if (firefly2.intensity > firefly.intensity):
@@ -100,10 +104,12 @@ class FireflySwarm():
 
         return self.best_value, self.g_best.tolist()
     
-class FSO:
+class FSO_AI:
     def __init__(self, repository, model):
         self.repository = repository
         self.model = model
+        self.AI_model = None
+        self.header = None
         self.current_values = self.getInitialValues()
         self.steps = np.array(self.get_steps(), dtype=float)
         # self.limites = simulation_config['Resources']
@@ -117,15 +123,17 @@ class FSO:
         print("files:", self.repository.model_file)
 
     def execute_simulation(self, event):
-        print("INICIANDO FIREFLY.")
+        print("INICIANDO FIREFLY AI.")
+        self.AI_model, self.header = self.model_train(event)
         best_values = {"Params": [], "Value": ""}
         best_values['Params'] = self.current_values
         best_values['Value'] = float(self.repository.best_values['Value'])
         self.update_params(best_values)
+
         while not event.is_set():
             print("MOVENDO AS VAGALUMES.")
             aux = {"Params": [], "Value": ""}
-            aux['Value'], aux['Params'] = self.swarm.update(self.generator, self.repository)
+            aux['Value'], aux['Params'] = self.swarm.update(self.header, self.generator, self.repository)
 
             if(aux['Value'] > best_values['Value'] and self.max_prob) or (aux['Value'] < best_values['Value'] and not self.max_prob):
                 best_values = aux
@@ -134,36 +142,93 @@ class FSO:
             print("FIM DA COMPARAÇÃO.")
         
         #PARA ANÁLISE DE RESULTADOS
-        print("Salvando os resultados em Firefly_"+self.repository.model_file[:-4]+".json")
-        with open("data/results/Firefly_"+self.repository.model_file[:-4]+".json", 'w') as file:
+        print("Salvando os resultados em Firefly_AI_"+self.repository.model_file[:-4]+".json")
+        with open("data/results/Firefly_AI_"+self.repository.model_file[:-4]+".json", 'w') as file:
             json.dump(self.best_values_set, file, indent=4)
                 
 
-    def generator(self, inputs):
+    def generator(self, inputs, header):
         # Criando um vetor de valores para cada particula (Pré-setado)
         values = [(-np.inf if self.max_prob else np.inf) for _ in range(len(inputs))]
-        print("GERANDO \"INPUTS.CSV")
-        with open("data/" + self.repository.input_file, 'r+') as file:
-            line = file.readline()
+        
+        print("REALIZANDO PREDIÇÕES")
+        for idx, input in enumerate(inputs):
+            predicted = self.AI_model.predict([input])
+            resources = [i for i in input]
+            resources.extend(predicted[0])
+            
+            try:
+                new_value = float(predicted[0][-1])
+            except:
+                continue
+            if (verify_constraints(header, resources, self.repository)):
+                values[idx] = new_value
+        print("FIM DAS PREDIÇÕES")
 
-        with open("data/" + self.repository.input_file, 'w') as file:
-            file.write(line)
-            for v in inputs:
-                l = "\n"
-                for v_i in v:
-                    l += str(int(v_i)) + " "
-                
-                file.write(l)
+        return values
 
-        print("INICIANDO EXECUÇÃO DAS SIMULAÇÕES.")
-        if sys.platform.startswith('linux'):
-            os.system("java -jar JaamSim2024-08.jar " + self.repository.model_file + " -h")
-        else:
-            os.system("java -jar JaamSim2024-08.jar data/" + self.repository.model_file + " -h")
+    def model_train(self, event):
+        iterations = int(int(self.repository.min_simulations_train)/100)
+        print("GERANDO DADOS DE TREINAMENTO")
+        for i in range(0,iterations):
+            if event.is_set():
+                break
+            
+            TempFilesHandler.generate_random_inputs(self.repository.input_file, self.repository.resources)
+            
+            if sys.platform.startswith('linux'):
+                os.system("java -jar JaamSim2024-08.jar " + self.repository.model_file + " -h")
+            else:
+                os.system("java -jar JaamSim2024-08.jar data/" + self.repository.model_file + " -h")
 
-        print("FIM DAS SIMULAÇÕES")
-        print("COMPARANDO OS RESULTADOS COM O MELHOR ATUAL")
-        with open("data/" + self.repository.model_file[:-3] + "dat", 'r') as output_file:
+            TempFilesHandler.save_result(self.repository.model_file, self.repository.output_file_path)
+
+            TempFilesHandler.clear_input_file(self.repository.input_file)
+
+        print("TREINANDO O MODELO")
+
+        if self.repository.ml_algorithm == "RF":
+            if not os.path.exists(f"data/Models/{self.repository.model_file[:-4]}_RandomForestRegressor.joblib"):
+                train_x, train_y = train_split(self.repository.output_file_path, self.repository.resources)
+                model = RandomForestRegressor()
+                model.fit(train_x, train_y)
+                joblib.dump(model, f"data/Models/{self.repository.model_file[:-4]}_RandomForestRegressor.joblib")
+            else:
+                print("Loaded")
+                model = joblib.load(f"data/Models/{self.repository.model_file[:-4]}_RandomForestRegressor.joblib")
+
+        if self.repository.ml_algorithm == "DT":
+            if not os.path.exists(f"data/Models/{self.repository.model_file[:-4]}_DecisionTree.joblib"):
+                train_x, train_y = train_split(self.repository.output_file_path, self.repository.resources)
+                model = DecisionTreeRegressor()
+                print("TREINO:", train_x[:5], train_y[:5])
+                model.fit(train_x, train_y)
+                joblib.dump(model, f"data/Models/{self.repository.model_file[:-4]}_DecisionTree.joblib")
+            else:
+                print("Loaded")
+                model = joblib.load(f"data/Models/{self.repository.model_file[:-4]}_DecisionTree.joblib")
+
+        if self.repository.ml_algorithm == "KN":
+            if not os.path.exists(f"data/Models/{self.repository.model_file[:-4]}_KNeighborsRegressor.joblib"):
+                train_x, train_y = train_split(self.repository.output_file_path, self.repository.resources)
+                model = KNeighborsRegressor()
+                model.fit(train_x, train_y)
+                joblib.dump(model, f"data/Models/{self.repository.model_file[:-4]}_KNeighborsRegressor.joblib")
+            else:
+                print("Loaded")
+                model = joblib.load(f"data/Models/{self.repository.model_file[:-4]}_KNeighborsRegressor.joblib")
+
+        if self.repository.ml_algorithm == "GP":
+            if not os.path.exists(f"data/Models/{self.repository.model_file[:-4]}_GaussianProcessRegressor.joblib"):
+                train_x, train_y = train_split(self.repository.output_file_path, self.repository.resources)
+                model = GaussianProcessRegressor()
+                model.fit(train_x, train_y)
+                joblib.dump(model, f"data/Models/{self.repository.model_file[:-4]}_GaussianProcessRegressor.joblib")
+            else:
+                print("Loaded")
+                model = joblib.load(f"data/Models/{self.repository.model_file[:-4]}_GaussianProcessRegressor.joblib")
+
+        with open(self.repository.output_file_path, 'r') as output_file:
             lines = output_file.readlines()
             for line in lines:
                 line = re.sub(r'\t+', ' ', line).split()
@@ -171,35 +236,8 @@ class FSO:
                 if('Scenario' not in line[0]): continue
                 header = line
                 break
-
-            #print("HEADER: ", header)
-            idx = 0
-
-            for line in lines:
-                line = re.sub(r'\t+', ' ', line).split()
-                if(len(line) == 0): continue
-                if('Scenario' in line[0]): continue
-
-                try:
-                    new_value = float(line[-1])
-                except:
-                    continue 
-
-                self.interaction += 1
-
-                for i in range(0, len(line[2:len(self.repository.resources)+2])):
-                    self.current_values[i] = int(float(line[i+2]))
-                
-                resources = [int(float(resource)) for resource in line[2:]]
-                #print("RESOURCES",idx, resources)
-                idx+=1
-
-                if (verify_constraints(header, resources, self.repository)):
-                    values[int(line[0])-1] = new_value
-
-                
-        print("Shape", len(values))
-        return values
+        print("Fim do treinamento do modelo")
+        return model, header
                  
     def getInitialValues(self):
         if int(self.model.best_values['Value']) > 0:

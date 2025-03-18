@@ -8,6 +8,8 @@ from Modules.ScatterAI import ScatterAI
 from Modules.GraspAI import GraspAI
 from Modules.PSO import PSO
 from Modules.Firefly import FSO
+from Modules.PSOAI import PSO_AI
+from Modules.FireflyAI import FSO_AI
 from Utility.graph_generator import build_graph
 import os
 os.environ['KIVY_NO_CONSOLELOG'] = '1'  # Oculta logs do Kivy
@@ -70,10 +72,20 @@ class OptResultScreenController:
             pso = PSO(self.view.app.repository, self.model)
             simulation_thread = threading.Thread(target=pso.execute_simulation, args=(self.view.stop_optimization,))
             simulation_thread.start()
+        
+        if opt_method == "PSO AI":
+            pso_ai = PSO_AI(self.view.app.repository, self.model)
+            simulation_thread = threading.Thread(target=pso_ai.execute_simulation, args=(self.view.stop_optimization,))
+            simulation_thread.start()
 
         if opt_method == "Firefly":
             firefly = FSO(self.view.app.repository, self.model)
             simulation_thread = threading.Thread(target=firefly.execute_simulation, args=(self.view.stop_optimization,))
+            simulation_thread.start()
+        
+        if opt_method == "Firefly AI":
+            firefly_ai = FSO_AI(self.view.app.repository, self.model)
+            simulation_thread = threading.Thread(target=firefly_ai.execute_simulation, args=(self.view.stop_optimization,))
             simulation_thread.start()
             
     def update_repository(self):
